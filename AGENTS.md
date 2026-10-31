@@ -81,3 +81,5 @@ SvelteKit 3 / Svelte 5 Runes / TypeScript strict / Bun package manager・runtime
 検証はbun install --frozen-lockfile、bun run check、bun run lint、bun run test:unit、bun run build、bun run test:e2e。PlaywrightのmobileはChromiumによるモバイル幅エミュレーションであり、Safari/iOS実機検証の代用としない。資格情報が必要な外部API検証を勝手に行わない。
 
 認証E2Eはbun run build後bun run test:authでcanonical localhost:5173を使用する。localhost以外や別portを許可Originに追加して迂回しない。CDP仮想認証器だけを使い、実TouchID/PasswordManagerの操作・private keyの取り出し・trace/video/HAR/screenshot/storageStateの保存・Cookie/CSRFのログ出力を禁止する。API/PostgreSQLが稼働している時だけ実行し、通常CIの公開画面E2Eと区別する。
+
+For adapter-bun 1.0, configure the canonical Origin with Kit paths.origin; runtime ORIGIN is not read. Keep original Host validation. Never bypass origin mismatches by disabling CSRF or adding trustedOrigins.
