@@ -76,6 +76,8 @@ SvelteKit 3 / Svelte 5 Runes / TypeScript strict / Bun package manager・runtime
 
 ローカルはApple containerを使い、Docker Engine/Desktop/CLI/Composeは使わない。実装と検証はローカル作業ブランチで進め、ユーザーの最新指示によりPR作成・Codex指摘対応・条件成立後のmergeを進める。mainへ直接pushしない。APIキー・秘密鍵・DBパスワード等が必要になった時点で依存作業を停止しユーザーへ確認する。無断生成、既存credential探索、認証無効化による迂回をしない。
 
-起動はloopback限定。server-only API clientの接続先を外部入力から指定させない。現在は固定127.0.0.1:8080の公開health/versionだけを扱い、個人情報・予約・決済・管理認可は実装しない。実装済みの画面と未実装の業務機能を混同しない。
+起動はloopback限定。server-only API clientの接続先を外部入力から指定させない。固定127.0.0.1:8080のhealth/versionとallowlist済み認証APIだけを扱う。Passkey UIとBFFはローカル検証用。予約・決済・社員Workspace承認・管理認可は未実装。実装済みの画面と未実装の業務機能を混同しない。
 
 検証はbun install --frozen-lockfile、bun run check、bun run lint、bun run test:unit、bun run build、bun run test:e2e。PlaywrightのmobileはChromiumによるモバイル幅エミュレーションであり、Safari/iOS実機検証の代用としない。資格情報が必要な外部API検証を勝手に行わない。
+
+認証E2Eはbun run build後bun run test:authでcanonical localhost:5173を使用する。localhost以外や別portを許可Originに追加して迂回しない。CDP仮想認証器だけを使い、実TouchID/PasswordManagerの操作・private keyの取り出し・trace/video/HAR/screenshot/storageStateの保存・Cookie/CSRFのログ出力を禁止する。API/PostgreSQLが稼働している時だけ実行し、通常CIの公開画面E2Eと区別する。

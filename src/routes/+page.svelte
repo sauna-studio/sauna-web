@@ -153,3 +153,7 @@
 		<span>Sauna Studio</span><span>立ち止まる時間を、日常に。</span>
 	</footer>
 </div>
+
+<nav class="bg-background p-5 text-center text-foreground">
+	<a class="underline" href={resolve('/auth')}>Passkeyログインへ</a>
+</nav>

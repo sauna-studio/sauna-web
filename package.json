@@ -7,7 +7,7 @@
 		"dev": "bun --bun vite dev --host 127.0.0.1",
 		"build": "bun --bun vite build",
 		"preview": "bun --bun vite preview --host 127.0.0.1",
-		"start": "HOST=127.0.0.1 PORT=5173 ORIGIN=http://127.0.0.1:5173 bun ./build",
+		"start": "HOST=127.0.0.1 PORT=5173 ORIGIN=http://localhost:5173 bun ./build",
 		"prepare": "bun --bun svelte-kit sync",
 		"check": "bun --bun svelte-kit sync && bun --bun svelte-check --tsconfig ./tsconfig.json",
 		"lint": "bun --bun prettier --check . && bun --bun eslint .",
@@ -16,7 +16,8 @@
 		"test:e2e": "bun --bun playwright test",
 		"test": "bun run test:unit",
 		"api:generate": "bun --bun openapi-typescript openapi/sauna-api.yaml -o src/lib/api/schema.d.ts",
-		"api:smoke": "bun scripts/check-local-api.ts"
+		"api:smoke": "bun scripts/check-local-api.ts",
+		"test:auth": "bun --bun playwright test --config playwright.auth.config.ts"
 	},
 	"devDependencies": {
 		"@eslint/js": "10.0.1",
