@@ -7,7 +7,7 @@
 		"dev": "bun --bun vite dev --host 127.0.0.1",
 		"build": "bun --bun vite build",
 		"preview": "bun --bun vite preview --host 127.0.0.1",
-		"start": "HOST=127.0.0.1 PORT=5173 ORIGIN=http://localhost:5173 bun ./build",
+		"start": "HOST=127.0.0.1 PORT=5173 bun ./build",
 		"prepare": "bun --bun svelte-kit sync",
 		"check": "bun --bun svelte-kit sync && bun --bun svelte-check --tsconfig ./tsconfig.json",
 		"lint": "bun --bun prettier --check . && bun --bun eslint .",

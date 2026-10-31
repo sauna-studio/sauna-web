@@ -64,7 +64,12 @@ export async function proxyAuthentication(
 	path: string,
 	fetcher: typeof fetch = fetch
 ): Promise<Response> {
-	if (url.origin !== authOrigin || url.search || methods.get(path) !== request.method)
+	if (
+		url.origin !== authOrigin ||
+		request.headers.get('Host') !== new URL(authOrigin).host ||
+		url.search ||
+		methods.get(path) !== request.method
+	)
 		return failure(404);
 	const origin = request.headers.get('Origin');
 	if ((origin !== null && origin !== authOrigin) || (request.method !== 'GET' && origin === null))

@@ -15,6 +15,17 @@
 	let supported = $state(false);
 	let busy = $state(false);
 	let message = $state('');
+	$effect(() => {
+		if (!session) return;
+		const expiresAt = session.expiresAtUnixSeconds;
+		const timer = window.setInterval(() => {
+			if (Date.now() >= expiresAt * 1000) {
+				session = null;
+				message = 'セッションの有効期限が切れました。再度ログインしてください。';
+			}
+		}, 1000);
+		return () => window.clearInterval(timer);
+	});
 	onMount(() => {
 		supported = supportsPasskeys();
 		void readSession()

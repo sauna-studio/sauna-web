@@ -4,6 +4,11 @@ test('resident UV registration requires sign-in, then session reload/logout/revo
 	page,
 	context
 }) => {
+	const statuses: string[] = [];
+	page.on('response', (r) => {
+		const path = new URL(r.url()).pathname;
+		if (path.startsWith('/auth/api/')) statuses.push(path + ':' + r.status());
+	});
 	const cdp = await context.newCDPSession(page);
 	await cdp.send('WebAuthn.enable', { enableUI: false });
 	const { authenticatorId } = await cdp.send('WebAuthn.addVirtualAuthenticator', {
@@ -52,8 +57,10 @@ test('resident UV registration requires sign-in, then session reload/logout/revo
 		await page
 			.getByRole('button', { name: 'すべてのセッションからログアウト', exact: true })
 			.click();
+		await expect(page.getByTestId('session-status')).toHaveText('ログインしていません。');
 		await page.reload();
 		await expect(page.getByTestId('session-status')).toHaveText('ログインしていません。');
+		expect(statuses.includes('/auth/api/auth/sessions/revoke-all:204')).toBe(true);
 	} finally {
 		await cdp.send('WebAuthn.removeVirtualAuthenticator', { authenticatorId });
 		await cdp.send('WebAuthn.disable');

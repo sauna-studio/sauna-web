@@ -16,6 +16,7 @@ function request(
 			method,
 			headers: {
 				'Sec-Fetch-Site': 'same-origin',
+				Host: new URL(authOrigin).host,
 				...(method === 'GET' ? {} : { Origin: authOrigin }),
 				...headers
 			},
@@ -174,6 +175,7 @@ it('cancels a stalled request body at the shared deadline', async () => {
 		method: 'POST',
 		headers: {
 			Origin: authOrigin,
+			Host: new URL(authOrigin).host,
 			'Sec-Fetch-Site': 'same-origin',
 			'Content-Type': 'application/json'
 		},
@@ -201,4 +203,28 @@ it.each([302, 500, 200, 401])('discards rejected upstream body %s', async (statu
 	);
 	expect(response.status).toBe(status === 401 ? 401 : 503);
 	expect(cancel).toHaveBeenCalledOnce();
+});
+
+it('denies Host spoofing even when the adapter canonicalizes event.url', async () => {
+	const { response, fetcher } = await run('auth/session', 'GET', { Host: 'elsewhere.invalid' });
+	expect(response.status).toBe(404);
+	expect(fetcher).not.toHaveBeenCalled();
+});
+
+it.each(['', 'localhost:5173,localhost:5173'])(
+	'rejects empty/duplicate-comma Host %s',
+	async (Host) => {
+		const { response, fetcher } = await run('auth/session', 'GET', { Host });
+		expect(response.status).toBe(404);
+		expect(fetcher).not.toHaveBeenCalled();
+	}
+);
+it('requires the original Host even with canonical event.url', async () => {
+	const input = request();
+	input.request.headers.delete('Host');
+	const fetcher = vi.fn<typeof fetch>();
+	expect(
+		(await proxyAuthentication(input.request, input.url, 'auth/session', fetcher)).status
+	).toBe(404);
+	expect(fetcher).not.toHaveBeenCalled();
 });
