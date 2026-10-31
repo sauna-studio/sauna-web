@@ -56,7 +56,7 @@ Sauna APIを正本とし、WebAuthn / Passkeyでログインする。最新安�
 
 実装後はbun install --frozen-lockfile / bun run check / bun run test:unit / bun run buildとPlaywright検証を実行する。
 
-初期CIは共通Repository policy検査のみ。アプリのビルド・テスト・実行を検証済みとは扱わない。実装Issueでmanifest・lockfile・テストを追加し、対応する実コードCIを有効化する。
+CIは共通Repository policyに加え、固定Bunでfrozen install/check/lint/unit/build/Playwrightを実行する。未実行の検証は成功と表現しない。
 
 ## GitHub Codexレビューとマージ条件
 
@@ -74,7 +74,7 @@ Sauna APIを正本とし、WebAuthn / Passkeyでログインする。最新安�
 
 SvelteKit 3 / Svelte 5 Runes / TypeScript strict / Bun package manager・runtime / Vite / Tailwind CSS v4 / shadcn-svelte / Lucide Svelte (@lucide/svelte) / Superforms + Zod / openapi-fetch / Vitest / Playwright / ESLint + Prettierを使用する。Bunは1.4.4に固定しbun.lockを維持する。TypeScriptはKit3のpeer範囲である6系の安定版を使用する。生成したOpenAPI型はopenapi/sauna-api.yamlから再生成し、手編集しない。API契約の正本はsauna-api。
 
-ローカルはApple containerを使い、Docker Engine/Desktop/CLI/Composeは使わない。今回はローカルブランチのみで作業し、push/PR/Actionsは実行しない。APIキー・秘密鍵・DBパスワード等が必要になった時点で依存作業を停止しユーザーへ確認する。無断生成、既存credential探索、認証無効化による迂回をしない。
+ローカルはApple containerを使い、Docker Engine/Desktop/CLI/Composeは使わない。実装と検証はローカル作業ブランチで進め、ユーザーの最新指示によりPR作成・Codex指摘対応・条件成立後のmergeを進める。mainへ直接pushしない。APIキー・秘密鍵・DBパスワード等が必要になった時点で依存作業を停止しユーザーへ確認する。無断生成、既存credential探索、認証無効化による迂回をしない。
 
 起動はloopback限定。server-only API clientの接続先を外部入力から指定させない。現在は固定127.0.0.1:8080の公開health/versionだけを扱い、個人情報・予約・決済・管理認可は実装しない。実装済みの画面と未実装の業務機能を混同しない。
 
