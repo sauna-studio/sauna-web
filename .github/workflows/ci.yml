@@ -14,3 +14,24 @@ jobs:
     uses: sauna-studio/.github/.github/workflows/reusable-repository.yml@84222ff551e9b6e9bab6ba4f29fe3ddb990b37cb
     permissions:
       contents: read
+
+  web:
+    name: Bun web validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: '1.4.4'
+      - run: bun install --frozen-lockfile
+      - run: bun run check
+      - run: bun run lint
+      - run: bun run test:unit
+      - run: bun run build
+      - run: bun --bun playwright install --with-deps chromium
+      - run: bun run test:e2e
