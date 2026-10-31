@@ -28,6 +28,15 @@ APIは`swift build` / `swift test`とPostgreSQL 18統合テスト、Webはlockfi
 
 `.github`リポジトリで共通基盤を変更するときの検証は`python scripts/validate_repository.py`（Python 3.11以上、`scripts/validation-requirements.txt`を使用）と`actionlint`。他のリポジトリでは末尾の固有指針とREADMEにある実在する検証手順を使う。Reusable Workflowsは呼出先の実コード・lockfile・テストが存在してから有効化する。
 
+## 記述の責務
+
+- **コードには How**：実装方法をコードの構造・名前・処理で表現する。
+- **テストコードには What**：期待する振る舞いと保証する結果を示す。
+- **コミットログには Why**：変更が必要な理由と解決する問題を記録する。
+- **コードコメントには Why not**：代替案を採用しない理由と必要な制約を説明する。
+
+記述の責務の適用元: `sauna-studio/.github@8c079a24796dd0f5ea28f3c5e6fb0b017d4c80b6`。
+
 ## セキュリティ
 
 Secrets、トークン、個人情報、実顧客データをコード・ログ・Issue・PRに残さない。認証情報の値を出力しない。施設IDは信頼できるセッションと権限から検証し、全読み書きで施設境界を守る。金額は通貨と最小単位の整数で扱い、クライアントの価格を信頼しない。予約はDBトランザクション・制約・競合テストで過剰予約を防ぐ。Stripe webhookは署名と冪等性を検証し、決済成功をブラウザの戻り値で確定しない。
@@ -76,6 +85,10 @@ SvelteKit 3 / Svelte 5 Runes / TypeScript strict / Bun package manager・runtime
 
 ローカルはApple containerを使い、Docker Engine/Desktop/CLI/Composeは使わない。実装と検証はローカル作業ブランチで進め、ユーザーの最新指示によりPR作成・Codex指摘対応・条件成立後のmergeを進める。mainへ直接pushしない。APIキー・秘密鍵・DBパスワード等が必要になった時点で依存作業を停止しユーザーへ確認する。無断生成、既存credential探索、認証無効化による迂回をしない。
 
-起動はloopback限定。server-only API clientの接続先を外部入力から指定させない。現在は固定127.0.0.1:8080の公開health/versionだけを扱い、個人情報・予約・決済・管理認可は実装しない。実装済みの画面と未実装の業務機能を混同しない。
+起動はloopback限定。server-only API clientの接続先を外部入力から指定させない。固定127.0.0.1:8080のhealth/versionとallowlist済み認証APIだけを扱う。Passkey UIとBFFはローカル検証用。予約・決済・社員Workspace承認・管理認可は未実装。実装済みの画面と未実装の業務機能を混同しない。
 
 検証はbun install --frozen-lockfile、bun run check、bun run lint、bun run test:unit、bun run build、bun run test:e2e。PlaywrightのmobileはChromiumによるモバイル幅エミュレーションであり、Safari/iOS実機検証の代用としない。資格情報が必要な外部API検証を勝手に行わない。
+
+認証E2Eはbun run build後bun run test:authでcanonical localhost:5173を使用する。localhost以外や別portを許可Originに追加して迂回しない。CDP仮想認証器だけを使い、実TouchID/PasswordManagerの操作・private keyの取り出し・trace/video/HAR/screenshot/storageStateの保存・Cookie/CSRFのログ出力を禁止する。API/PostgreSQLが稼働している時だけ実行し、通常CIの公開画面E2Eと区別する。
+
+For adapter-bun 1.0, configure the canonical Origin with Kit paths.origin; runtime ORIGIN is not read. Keep original Host validation. Never bypass origin mismatches by disabling CSRF or adding trustedOrigins.

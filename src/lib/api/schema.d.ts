@@ -44,6 +44,146 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/passkeys/registration/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * beginPasskeyRegistration
+         * @description Local-only origin policy. Registration does not issue a session. Session issuance requires a valid signed assertion with user verification. The exact Origin selects the customer/staff host cookie. Flow cookies bind ceremonies.
+         */
+        post: operations["beginPasskeyRegistration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/passkeys/registration/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * finishPasskeyRegistration
+         * @description Local-only origin policy. Registration does not issue a session. Session issuance requires a valid signed assertion with user verification. The exact Origin selects the customer/staff host cookie. Flow cookies bind ceremonies.
+         */
+        post: operations["finishPasskeyRegistration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/passkeys/authentication/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * beginPasskeyAuthentication
+         * @description Local-only origin policy. Registration does not issue a session. Session issuance requires a valid signed assertion with user verification. The exact Origin selects the customer/staff host cookie. Flow cookies bind ceremonies.
+         */
+        post: operations["beginPasskeyAuthentication"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/passkeys/authentication/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * finishPasskeyAuthentication
+         * @description Local-only origin policy. Registration does not issue a session. Session issuance requires a valid signed assertion with user verification. The exact Origin selects the customer/staff host cookie. Flow cookies bind ceremonies.
+         */
+        post: operations["finishPasskeyAuthentication"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * getAuthSession
+         * @description Local-only origin policy. Registration does not issue a session. Session issuance requires a valid signed assertion with user verification. The exact Origin selects the customer/staff host cookie. Flow cookies bind ceremonies.
+         */
+        get: operations["getAuthSession"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * logoutSession
+         * @description Local-only origin policy. Registration does not issue a session. Session issuance requires a valid signed assertion with user verification. The exact Origin selects the customer/staff host cookie. Flow cookies bind ceremonies.
+         */
+        post: operations["logoutSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/sessions/revoke-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * revokeAllSessions
+         * @description Local-only origin policy. Registration does not issue a session. Session issuance requires a valid signed assertion with user verification. The exact Origin selects the customer/staff host cookie. Flow cookies bind ceremonies.
+         */
+        post: operations["revokeAllSessions"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -69,6 +209,34 @@ export interface components {
             title: "Service Unavailable";
             /** @enum {integer} */
             status: 503;
+        };
+        PasskeyOptionsResponse: {
+            /** Format: uuid */
+            challengeID: string;
+            publicKey: {
+                [key: string]: unknown;
+            };
+        };
+        PasskeyFinishRequest: {
+            /** Format: uuid */
+            challengeID: string;
+            /** @description JSON.stringify of the WebAuthn credential.toJSON() result. Original clientDataJSON bytes remain encoded within it. */
+            credentialJSON: string;
+        };
+        AuthSession: {
+            /** Format: uuid */
+            userID: string;
+            /** Format: int64 */
+            expiresAtUnixSeconds: number;
+            csrfToken: string;
+        };
+        AuthenticationProblem: {
+            /** @enum {string} */
+            type: "about:blank";
+            /** @enum {string} */
+            title: "Bad Request" | "Unauthorized" | "Forbidden" | "Payload Too Large" | "Too Many Requests" | "Service Unavailable";
+            /** @enum {integer} */
+            status: 400 | 401 | 403 | 413 | 429 | 503;
         };
     };
     responses: {
@@ -129,6 +297,557 @@ export interface operations {
                 };
             };
             503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    beginPasskeyRegistration: {
+        parameters: {
+            query?: never;
+            header: {
+                Origin: "http://localhost:5173" | "http://localhost:5174";
+                "X-Sauna-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful local authentication operation. */
+            200: {
+                headers: {
+                    /** @description Secure HttpOnly SameSite=Strict host-only flow/session cookie. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PasskeyOptionsResponse"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+        };
+    };
+    finishPasskeyRegistration: {
+        parameters: {
+            query?: never;
+            header: {
+                Origin: "http://localhost:5173" | "http://localhost:5174";
+                "X-Sauna-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasskeyFinishRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful local authentication operation. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Fixed authentication error without internal details. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+        };
+    };
+    beginPasskeyAuthentication: {
+        parameters: {
+            query?: never;
+            header: {
+                Origin: "http://localhost:5173" | "http://localhost:5174";
+                "X-Sauna-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful local authentication operation. */
+            200: {
+                headers: {
+                    /** @description Secure HttpOnly SameSite=Strict host-only flow/session cookie. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PasskeyOptionsResponse"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+        };
+    };
+    finishPasskeyAuthentication: {
+        parameters: {
+            query?: never;
+            header: {
+                Origin: "http://localhost:5173" | "http://localhost:5174";
+                "X-Sauna-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasskeyFinishRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful local authentication operation. */
+            200: {
+                headers: {
+                    /** @description Secure HttpOnly SameSite=Strict host-only flow/session cookie. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthSession"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+        };
+    };
+    getAuthSession: {
+        parameters: {
+            query?: never;
+            header: {
+                Origin: "http://localhost:5173" | "http://localhost:5174";
+                "X-Sauna-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful local authentication operation. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthSession"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+        };
+    };
+    logoutSession: {
+        parameters: {
+            query?: never;
+            header: {
+                Origin: "http://localhost:5173" | "http://localhost:5174";
+                "X-Sauna-CSRF": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful local authentication operation. */
+            204: {
+                headers: {
+                    /** @description Secure HttpOnly SameSite=Strict host-only flow/session cookie. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Fixed authentication error without internal details. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+        };
+    };
+    revokeAllSessions: {
+        parameters: {
+            query?: never;
+            header: {
+                Origin: "http://localhost:5173" | "http://localhost:5174";
+                "X-Sauna-CSRF": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful local authentication operation. */
+            204: {
+                headers: {
+                    /** @description Secure HttpOnly SameSite=Strict host-only flow/session cookie. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Fixed authentication error without internal details. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
         };
     };
 }
