@@ -6,7 +6,7 @@
 
 川沿いの小規模サウナ施設の予約・決済・運営を開発する。初期は1施設でも施設IDと施設単位の認可を設計する。予約・決済・シフトなどの業務データはSauna API / PostgreSQLを正本とし、外部サービスを正本にしない。
 
-API: Swift 6 / Hummingbird / PostgreSQL 18 / PostgresNIO / Atlas / OpenAPI / Swift OpenAPI Generator。Apple: SwiftUI、iOS・iPadOS 27.2以上。Web: SvelteKit / TypeScript。基盤: Terraform / Cloud Run / Cloud SQL / Docker / OpenTelemetry。最新安定版OS・ブラウザを対象とし、不要な後方互換分岐を追加しない。
+API: Swift 6 / Hummingbird / PostgreSQL 18 / PostgresNIO / Atlas / OpenAPI / Swift OpenAPI Generator。Apple: SwiftUI、iOS・iPadOS 27.2以上。Web: SvelteKit / TypeScript。基盤: Terraform / Cloud Run / Cloud SQL / OCIコンテナ / OpenTelemetry（ローカル実行はApple container）。最新安定版OS・ブラウザを対象とし、不要な後方互換分岐を追加しない。
 
 ログインはPasskey / WebAuthnのみ。社員のGoogle Workspace組織アカウントは所属・本人対応・API認可に使い、GoogleログインをSaunaセッション認証に代用しない。Stripeは決済処理を担当する。Google Cloud Swiftクライアントの対応範囲とWorkspace APIの対応範囲を個別に確認する。Google Chat Bot / sauna-mcpは`sauna-automation`で実装する。`zunda-pixel/GoogleChatApp`とそのProjectは対象外であり変更しない。
 
@@ -54,7 +54,7 @@ PRには関連Issue、何が変わるか、実行したチェックと結果、�
 
 Sauna APIを正本とし、WebAuthn / Passkeyでログインする。最新安定版ブラウザを対象にVintage・Pumpkinを参照する。
 
-実装後はnpm ci / npm run check / npm test -- --run / npm run buildとPlaywright検証を実行する。
+実装後はbun install --frozen-lockfile / bun run check / bun run test:unit / bun run buildとPlaywright検証を実行する。
 
 初期CIは共通Repository policy検査のみ。アプリのビルド・テスト・実行を検証済みとは扱わない。実装Issueでmanifest・lockfile・テストを追加し、対応する実コードCIを有効化する。
 
@@ -69,3 +69,13 @@ Sauna APIを正本とし、WebAuthn / Passkeyでログインする。最新安�
 このGitHub上のレビューは、実装中の独立Review Agent並行起動と実ビルド・テストに追加する確認である。レビュー依頼だけで成功扱いにしない。自動返信・同じ依頼の連投を避け、レビューroundと対象commitをPRへ記録する。
 
 共通追加規則の適用元: `sauna-studio/.github@e24383d0f9fe6784293e1b781edffd08750f0a20` (`policies/github-codex-review.md`)。
+
+## ローカルWeb実装（2026-11-01ユーザー指定）
+
+SvelteKit 3 / Svelte 5 Runes / TypeScript strict / Bun package manager・runtime / Vite / Tailwind CSS v4 / shadcn-svelte / Lucide Svelte (@lucide/svelte) / Superforms + Zod / openapi-fetch / Vitest / Playwright / ESLint + Prettierを使用する。Bunは1.4.4に固定しbun.lockを維持する。TypeScriptはKit3のpeer範囲である6系の安定版を使用する。生成したOpenAPI型はopenapi/sauna-api.yamlから再生成し、手編集しない。API契約の正本はsauna-api。
+
+ローカルはApple containerを使い、Docker Engine/Desktop/CLI/Composeは使わない。今回はローカルブランチのみで作業し、push/PR/Actionsは実行しない。APIキー・秘密鍵・DBパスワード等が必要になった時点で依存作業を停止しユーザーへ確認する。無断生成、既存credential探索、認証無効化による迂回をしない。
+
+起動はloopback限定。server-only API clientの接続先を外部入力から指定させない。現在は固定127.0.0.1:8080の公開health/versionだけを扱い、個人情報・予約・決済・管理認可は実装しない。実装済みの画面と未実装の業務機能を混同しない。
+
+検証はbun install --frozen-lockfile、bun run check、bun run lint、bun run test:unit、bun run build、bun run test:e2e。PlaywrightのmobileはChromiumによるモバイル幅エミュレーションであり、Safari/iOS実機検証の代用としない。資格情報が必要な外部API検証を勝手に行わない。
