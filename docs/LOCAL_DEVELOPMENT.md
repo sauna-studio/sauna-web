@@ -37,8 +37,14 @@ OpenAPI snapshots come from sauna-api/Sources/SaunaAPIContract/openapi.yaml. Reg
 
 ## Scope and review gates
 
-Customers can register and then sign in using a signed assertion; registration alone creates no session. Staff UI permits login only and denies anonymous enrollment. Workspace membership, facility management authorization, booking and payment remain unimplemented. Authentication does not unlock those operations. In-memory session metadata is cleared on expiry.
+Customers can register and then sign in using a signed assertion; registration alone creates no session. Staff UI denies anonymous enrollment; authenticated users may manage only their own Passkeys. Workspace membership, facility management authorization, booking and payment remain unimplemented. Authentication does not unlock those operations. In-memory session metadata is cleared on expiry.
 
 See LOCAL_VALIDATION.md for actual local test evidence, including three successful real-browser repetitions per profile. Mobile Playwright means Chromium viewport emulation, not Safari/iOS validation. Safari MCP is not connected, and real platform authenticators remain unverified. Production deployment and external API authorization have not been performed.
 
-Use branches and PRs. Current latest-head GitHub Codex reviews failed due to an account usage limit; passing CI and independent local reviews do not permit merging. Resume a single latest-head review after capacity is restored, resolve findings, and merge only when all gates pass.
+Use branches and PRs. Review results must match the latest commit. Resolve findings, reply to review threads, and request a fresh `@codex review`; merge only after Codex reports no findings, all threads are resolved, and required CI succeeds. Review failures or usage limits are not a clean review.
+
+## Passkey management
+
+Authenticated users can list their own credentials and authorize addition using fresh signed UV, then explicitly create the new Passkey in a separate action. Revocation requires confirmation of the selected target and an assertion from another active key. The server protects the last active key and the ten-key limit even under concurrency. Successful changes revoke all account sessions and require login again. Credential count does not identify physical devices; full-loss recovery is not provided. No credential/key/session values are persisted in browser storage.
+
+The real management auth test uses two ephemeral CDP authenticators without exporting keys. For the staff suite, the customer production preview must also run at localhost:5173 to bootstrap an account through the customer enrollment UI; staff anonymous enrollment remains forbidden. Keep canonical ports free for the corresponding Playwright-managed server. `test:auth` is separate from synthetic public UI E2E and requires the updated API and PostgreSQL.

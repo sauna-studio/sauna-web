@@ -184,6 +184,126 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/passkeys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the current account passkeys
+         * @description Local authenticated credential management. Every write requires the current session and CSRF. A fresh action-bound signed UV assertion authorizes addition or revocation. Successful changes revoke all account sessions and require login again. Only a different active credential may authorize revocation; the last active credential cannot be revoked.
+         */
+        get: operations["listPasskeys"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/passkeys/addition/authorization/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Request fresh UV to add a passkey
+         * @description Local authenticated credential management. Every write requires the current session and CSRF. A fresh action-bound signed UV assertion authorizes addition or revocation. Successful changes revoke all account sessions and require login again. Only a different active credential may authorize revocation; the last active credential cannot be revoked.
+         */
+        post: operations["beginPasskeyAdditionAuthorization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/passkeys/addition/authorization/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Authorize one account-bound passkey registration
+         * @description Local authenticated credential management. Every write requires the current session and CSRF. A fresh action-bound signed UV assertion authorizes addition or revocation. Successful changes revoke all account sessions and require login again. Only a different active credential may authorize revocation; the last active credential cannot be revoked.
+         */
+        post: operations["finishPasskeyAdditionAuthorization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/passkeys/addition/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register the additional passkey and revoke all sessions
+         * @description Local authenticated credential management. Every write requires the current session and CSRF. A fresh action-bound signed UV assertion authorizes addition or revocation. Successful changes revoke all account sessions and require login again. Only a different active credential may authorize revocation; the last active credential cannot be revoked.
+         */
+        post: operations["finishPasskeyAddition"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/passkeys/revocation/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Request fresh UV from a different passkey
+         * @description Local authenticated credential management. Every write requires the current session and CSRF. A fresh action-bound signed UV assertion authorizes addition or revocation. Successful changes revoke all account sessions and require login again. Only a different active credential may authorize revocation; the last active credential cannot be revoked.
+         */
+        post: operations["beginPasskeyRevocation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/passkeys/revocation/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Revoke the bound passkey and all account sessions
+         * @description Local authenticated credential management. Every write requires the current session and CSRF. A fresh action-bound signed UV assertion authorizes addition or revocation. Successful changes revoke all account sessions and require login again. Only a different active credential may authorize revocation; the last active credential cannot be revoked.
+         */
+        post: operations["finishPasskeyRevocation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -237,6 +357,21 @@ export interface components {
             title: "Bad Request" | "Unauthorized" | "Forbidden" | "Payload Too Large" | "Too Many Requests" | "Service Unavailable";
             /** @enum {integer} */
             status: 400 | 401 | 403 | 413 | 429 | 503;
+        };
+        PasskeyRevocationRequest: {
+            /** @description Canonical base64url ID of an active credential belonging to this account. */
+            credentialID: string;
+        };
+        ManagedPasskey: {
+            credentialID: string;
+            /** Format: int64 */
+            createdAtUnixSeconds: number;
+            /** Format: int64 */
+            lastUsedAtUnixSeconds?: number;
+            isCurrentSessionCredential: boolean;
+        };
+        ManagedPasskeys: {
+            credentials: components["schemas"]["ManagedPasskey"][];
         };
     };
     responses: {
@@ -784,6 +919,484 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description Successful local authentication operation. */
+            204: {
+                headers: {
+                    /** @description Secure HttpOnly SameSite=Strict host-only flow/session cookie. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Fixed authentication error without internal details. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+        };
+    };
+    listPasskeys: {
+        parameters: {
+            query?: never;
+            header: {
+                Origin: "http://localhost:5173" | "http://localhost:5174";
+                "X-Sauna-CSRF"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Account-scoped credential management response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ManagedPasskeys"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+        };
+    };
+    beginPasskeyAdditionAuthorization: {
+        parameters: {
+            query?: never;
+            header: {
+                Origin: "http://localhost:5173" | "http://localhost:5174";
+                "X-Sauna-CSRF": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Account-scoped credential management response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PasskeyOptionsResponse"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+        };
+    };
+    finishPasskeyAdditionAuthorization: {
+        parameters: {
+            query?: never;
+            header: {
+                Origin: "http://localhost:5173" | "http://localhost:5174";
+                "X-Sauna-CSRF": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasskeyFinishRequest"];
+            };
+        };
+        responses: {
+            /** @description Account-scoped credential management response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PasskeyOptionsResponse"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+        };
+    };
+    finishPasskeyAddition: {
+        parameters: {
+            query?: never;
+            header: {
+                Origin: "http://localhost:5173" | "http://localhost:5174";
+                "X-Sauna-CSRF": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasskeyFinishRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful local authentication operation. */
+            204: {
+                headers: {
+                    /** @description Secure HttpOnly SameSite=Strict host-only flow/session cookie. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Fixed authentication error without internal details. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+        };
+    };
+    beginPasskeyRevocation: {
+        parameters: {
+            query?: never;
+            header: {
+                Origin: "http://localhost:5173" | "http://localhost:5174";
+                "X-Sauna-CSRF": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasskeyRevocationRequest"];
+            };
+        };
+        responses: {
+            /** @description Account-scoped credential management response. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PasskeyOptionsResponse"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+            /** @description Fixed authentication error without internal details. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AuthenticationProblem"];
+                };
+            };
+        };
+    };
+    finishPasskeyRevocation: {
+        parameters: {
+            query?: never;
+            header: {
+                Origin: "http://localhost:5173" | "http://localhost:5174";
+                "X-Sauna-CSRF": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasskeyFinishRequest"];
+            };
+        };
         responses: {
             /** @description Successful local authentication operation. */
             204: {
