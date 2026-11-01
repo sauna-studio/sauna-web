@@ -38,7 +38,12 @@
 		selectedID = null;
 		message = '操作を完了できませんでした。キャンセルした場合も、最初から確認し直してください。';
 		try {
-			if (!(await readSession(abort.signal)) && !abort.signal.aborted) onSessionLost();
+			const current = await readSession(abort.signal);
+			if (
+				!abort.signal.aborted &&
+				(!current || current.userID !== session.userID || current.csrfToken !== session.csrfToken)
+			)
+				onSessionLost();
 		} catch {
 			/* A network failure alone does not prove revocation; the server still validates each operation. */
 		}

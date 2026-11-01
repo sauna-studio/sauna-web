@@ -207,3 +207,34 @@ test('leaving credential management aborts the pending prompt without submitting
 	).toBe(true);
 	expect(proofs).toBe(0);
 });
+
+test('a changed session clears cached account state after a failed management operation', async ({
+	page
+}) => {
+	await managedAccount(page, 1);
+	let reads = 0;
+	await page.route(sessionPath, (route) =>
+		route.fulfill({
+			json: {
+				...accountSession,
+				csrfToken: reads++ === 0 ? accountSession.csrfToken : 'b'.repeat(43)
+			}
+		})
+	);
+	await page.addInitScript(() =>
+		Object.defineProperty(navigator.credentials, 'get', {
+			value: () => Promise.reject(new DOMException('cancelled', 'NotAllowedError')),
+			configurable: true
+		})
+	);
+	await page.route('**/auth/api/auth/passkeys/addition/authorization/options', (route) =>
+		route.fulfill({ json: managementOptions })
+	);
+	await page.goto('/auth');
+	await page.getByRole('button', { name: '既存のPasskeyで確認して追加', exact: true }).click();
+	await expect(page.getByTestId('session-status')).toHaveText('ログインしていません。');
+	await expect(page.getByRole('status')).toHaveText(
+		'セッションが失効または変更されました。再度ログインしてください。'
+	);
+	await expect(page.getByTestId('managed-passkeys')).toHaveCount(0);
+});

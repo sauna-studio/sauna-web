@@ -106,7 +106,7 @@
 						}}
 						onSessionLost={() => {
 							session = null;
-							message = 'セッションの有効期限が切れました。再度ログインしてください。';
+							message = 'セッションが失効または変更されました。再度ログインしてください。';
 						}}
 					/>
 					<Button disabled={busy} onclick={() => signOut(false)}>ログアウト</Button>
