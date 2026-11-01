@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';
+	import CredentialManager from '#lib/auth/credential-manager.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import {
@@ -94,6 +95,20 @@
 				</p>
 				{#if ready && !supported}<p>最新のPasskey対応ブラウザーをご利用ください。</p>{/if}
 				{#if session}
+					<CredentialManager
+						{supported}
+						{session}
+						bind:busy
+						onChanged={() => {
+							session = null;
+							message =
+								'Passkeyを変更しました。すべてのセッションからログアウトしました。再度ログインしてください。';
+						}}
+						onSessionLost={() => {
+							session = null;
+							message = 'セッションの有効期限が切れました。再度ログインしてください。';
+						}}
+					/>
 					<Button disabled={busy} onclick={() => signOut(false)}>ログアウト</Button>
 					<Button variant="outline" disabled={busy} onclick={() => signOut(true)}
 						>すべてのセッションからログアウト</Button

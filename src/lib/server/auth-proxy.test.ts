@@ -38,6 +38,27 @@ async function run(
 }
 describe('fixed local auth BFF', () => {
 	it.each([
+		['auth/passkeys', 'GET'],
+		['auth/passkeys/addition/authorization/options', 'POST'],
+		['auth/passkeys/addition/authorization/finish', 'POST'],
+		['auth/passkeys/addition/finish', 'POST'],
+		['auth/passkeys/revocation/options', 'POST'],
+		['auth/passkeys/revocation/finish', 'POST']
+	])('forwards only the exact management route and method: %s', async (path, method) => {
+		const { response, fetcher } = await run(path, method, {
+			Cookie: `${own}=${token}`,
+			'X-Sauna-CSRF': token
+		});
+		expect(response.status).toBe(200);
+		expect(fetcher.mock.calls[0][0]).toBe(`http://127.0.0.1:8080/${path}`);
+		const headers = fetcher.mock.calls[0][1]?.headers as Headers;
+		expect(headers.get('Cookie') === `${own}=${token}`).toBe(true);
+		expect(headers.get('X-Sauna-CSRF') === token).toBe(true);
+		const denied = await run(path, method === 'POST' ? 'GET' : 'POST');
+		expect(denied.response.status).toBe(404);
+		expect(denied.fetcher).not.toHaveBeenCalled();
+	});
+	it.each([
 		'auth/session/extra',
 		'auth/../session',
 		'https://elsewhere.invalid/',

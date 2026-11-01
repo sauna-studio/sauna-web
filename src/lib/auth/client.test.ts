@@ -52,7 +52,7 @@ it('uses generated contract and same-origin BFF for session', async () => {
 	const value = await readSession();
 	const request = fetcher.mock.calls[0][0] as Request;
 	expect(request.url).toBe(origin + '/auth/api/auth/session');
-	// Bun 1.4.4 reports Request.credentials as include even for same-origin; assert the native constructor input.
+	// Bun reports include for same-origin; the input probe is temporary until sauna-studio/sauna-web#13 is resolved.
 	expect(requestedCredentials).toBe('same-origin');
 	expect(request.cache).toBe('no-store');
 	expect(value?.csrfToken === metadata.csrfToken).toBe(true);

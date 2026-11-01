@@ -3,6 +3,12 @@ export const authOrigin = 'http://localhost:5173';
 const profile = 'customer';
 const limit = 128 * 1024;
 const methods = new Map([
+	['auth/passkeys', 'GET'],
+	['auth/passkeys/addition/authorization/options', 'POST'],
+	['auth/passkeys/addition/authorization/finish', 'POST'],
+	['auth/passkeys/addition/finish', 'POST'],
+	['auth/passkeys/revocation/options', 'POST'],
+	['auth/passkeys/revocation/finish', 'POST'],
 	['auth/passkeys/registration/options', 'POST'],
 	['auth/passkeys/registration/finish', 'POST'],
 	['auth/passkeys/authentication/options', 'POST'],

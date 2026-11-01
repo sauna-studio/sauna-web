@@ -102,3 +102,7 @@ SvelteKit 3 / Svelte 5 Runes / TypeScript strict / Bun package manager・runtime
 認証E2Eはbun run build後bun run test:authでcanonical localhost:5173を使用する。localhost以外や別portを許可Originに追加して迂回しない。CDP仮想認証器だけを使い、実TouchID/PasswordManagerの操作・private keyの取り出し・trace/video/HAR/screenshot/storageStateの保存・Cookie/CSRFのログ出力を禁止する。API/PostgreSQLが稼働している時だけ実行し、通常CIの公開画面E2Eと区別する。
 
 For adapter-bun 1.0, configure the canonical Origin with Kit paths.origin; runtime ORIGIN is not read. Keep original Host validation. Never bypass origin mismatches by disabling CSRF or adding trustedOrigins.
+
+## 本人のPasskey管理
+
+本人のcredential一覧・追加・失効はAPIのsessionとfresh署名/UVで検証する。追加は既存keyの認可と新key作成を別操作にし、intent/nonceを永続storageへ保存しない。失効は対象確認後に別keyで再認証し、最後のkeyと上限10はUIだけでなくAPIの競合制御で守る。管理成功で全session失効・再loginを要求する。pending認証器操作は離脱時にabortし、late結果を採用しない。staff本人のkey管理をWorkspace/施設の業務権限と混同しない。全credential喪失時の回復は未提供。
