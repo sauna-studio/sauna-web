@@ -7,3 +7,36 @@ updates:
     cooldown:
       default-days: 7
     open-pull-requests-limit: 5
+
+  - package-ecosystem: bun
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # Validate Svelte and its build/test tooling as one update.
+      svelte-toolchain:
+        patterns:
+          - "svelte"
+          - "@sveltejs/*"
+          - "svelte-check"
+          - "vite"
+          - "vitest"
+      # Keep Tailwind and its integration on the same release.
+      tailwind:
+        patterns:
+          - "tailwindcss"
+          - "@tailwindcss/*"
+      # Update ESLint and its configuration/plugins together.
+      eslint:
+        patterns:
+          - "eslint*"
+          - "@eslint/*"
+          - "typescript-eslint"
+      # Validate Prettier with its formatting plugins.
+      prettier:
+        patterns:
+          - "prettier"
+          - "prettier-plugin-*"
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
