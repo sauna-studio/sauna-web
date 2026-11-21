@@ -30,7 +30,7 @@
 		"@types/node": "26.6.6",
 		"bits-ui": "2.20.2",
 		"cn": "0.5.1",
-		"eslint": "10.14.0",
+		"eslint": "10.15.0",
 		"eslint-config-prettier": "10.1.8",
 		"eslint-plugin-svelte": "3.24.1",
 		"globals": "17.13.0",
