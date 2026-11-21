@@ -13,6 +13,16 @@ updates:
     schedule:
       interval: weekly
     groups:
+      # Validate generated OpenAPI types with the client that consumes them.
+      openapi:
+        patterns:
+          - "openapi-fetch"
+          - "openapi-typescript"
+      # Validate Superforms together with its Zod adapter.
+      forms:
+        patterns:
+          - "sveltekit-superforms"
+          - "zod"
       # Validate Svelte and its build/test tooling as one update.
       svelte-toolchain:
         patterns:
